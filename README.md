@@ -10,22 +10,29 @@ async.AsyncCallHandler allows controlling the execution of method calls in order
 of heavy greenlet usage.
 
 For instance, imagining we have a Manager entity that must handle some resources in an atomic manner:
-  from async import AsyncCallHandler
-  class Manager(AsyncCallHandler):
-      def manage(self):
-          # do things with resources
-          # with the assurance that the resources won't
-          # be modified during process
-          
-          self.process() # process pending calls
-          
-          # do more things
-          
-      def messes_up_resources(self, modifications):
-          # changes resources
-          
-      def run(self):
-          while True:
-              self.manage()
 
-  
+    from async import AsyncCallHandler
+    class Manager(AsyncCallHandler):
+        def manage(self):
+            # do things with resources
+            # with the assurance that the resources won't
+            # be modified during process
+
+            self.process() # process pending calls
+
+            # do more things
+
+        def messes_up_resources(self, modifications):
+            # changes resources
+
+        def run(self):
+            while True:
+                self.manage()
+
+We can startup the manager and call functions on it from multiple greenlets:
+
+    manager = Manager()
+    gevent.spawn(manager.run)
+
+    def monitor(target)
+        for event in target.events():
