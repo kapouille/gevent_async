@@ -3,7 +3,7 @@ from util import get_version, read_requirements, read_file
 
 
 NAME = 'gevent_async'
-VERSION = get_version(NAME)
+VERSION = read_file("VERSION.txt")
 README = read_file("README.md")
 CHANGES = ''
 
