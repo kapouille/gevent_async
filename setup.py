@@ -11,7 +11,8 @@ CHANGES = ''
 setup(
     name=NAME,
     version=VERSION,
-    description='ttvm job scheduler',
+    description='A small set of utilities to help with writing synchronous code flows in a collaborative multitasking '
+                'context. It has been designed around the feature set of gevent (http://www.gevent.org)',
     long_description=README + '\n\n' + CHANGES,
     classifiers=[
         "Programming Language :: Python",
