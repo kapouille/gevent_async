@@ -48,7 +48,7 @@ HERE = os.path.dirname(__file__)
 
 def read_file(filename):
     with open(filename) as fh:
-        return fh.read()
+        return fh.read().strip(' \t\n\r')
 
 
 def read_requirements(filename):
