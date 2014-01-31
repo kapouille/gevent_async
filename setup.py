@@ -20,7 +20,7 @@ setup(
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Utilities"
     ],
-    author='Olivier Carrère',
+    author='Olivier Carrere',
     author_email='olivier.carrere@gmail.com',
     url='http://github.com/kapouille/gevent_async',
     keywords='gevent state asychronous synchronous',
