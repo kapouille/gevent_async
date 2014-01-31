@@ -13,7 +13,8 @@ setup(
     version=VERSION,
     description='A small set of utilities to help with writing synchronous code flows in a collaborative multitasking '
                 'context. It has been designed around the feature set of gevent (http://www.gevent.org)',
-    long_description=README + '\n\n' + CHANGES,
+    long_description='Please find the documentation on the github repository '
+                     'page: http://github.com/kapouille/gevent_async',
     classifiers=[
         "Programming Language :: Python",
         "Development Status :: 4 - Beta",
