@@ -1,7 +1,11 @@
 from gevent.event import AsyncResult
 from .queue import EventQueue
+from logging import getLogger
 
-class _AsyncCallEvent(object):
+_LOG = getLogger(__name__)
+
+
+class _SyncCall(object):
     def __init__(self, name, *args, **kwargs):
         self._name = name
         self._args = args
@@ -19,7 +23,7 @@ class _AsyncCallEvent(object):
             self._result.set_exception(error)
 
 
-class _Async(object):
+class _Sync(object):
     class Handle(object):
         def __init__(self, target, name, timeout):
             self._name = name
@@ -27,7 +31,7 @@ class _Async(object):
             self._timeout = timeout
 
         def __call__(self, *args, **kwargs):
-            event = _AsyncCallEvent(self._name, *args, **kwargs)
+            event = _SyncCall(self._name, *args, **kwargs)
             self._target.add_request(event)
             return event.wait(self._timeout)
 
@@ -43,10 +47,45 @@ class _Async(object):
         return self.Handle(self._target, name, self._timeout)
 
 
-class AsyncCallHandler(object):
+class _OnewayCall(object):
+    def __init__(self, name, *args, **kwargs):
+        self._name = name
+        self._args = args
+        self._kwargs = kwargs
+
+    def execute(self, target):
+        try:
+            function = getattr(target, self._name)
+            function(*self._args, **self._kwargs)
+        except Exception as error:
+            _LOG.exception("Oneway call on {} failed with error: {}".format(function,
+                                                                            error))
+
+class _OneWay(object):
+    class Handle(object):
+        def __init__(self, target, name):
+            self._name = name
+            self._target = target
+
+        def __call__(self, *args, **kwargs):
+            event = _OnewayCall(self._name, *args, **kwargs)
+            self._target.add_request(event)
+
+    def __init__(self, target):
+        self._target = target
+
+    def __call__(self):
+        return self
+
+    def __getattr__(self, name):
+        return self.Handle(self._target, name)
+
+
+class DeferredCallHandler(object):
     def __init__(self):
         self._requests = EventQueue()
-        self.async = _Async(self)
+        self.sync = _Sync(self)
+        self.oneway = _OneWay(self)
 
     def add_request(self, request):
         self._requests.put(request)

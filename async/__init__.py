@@ -1,6 +1,6 @@
 __author__ = 'ocarrere'
 
-from .call import AsyncCallHandler
+from .call import DeferredCallHandler
 from .queue import EventQueue, Event
 from .state import state
 from .state import ValidationError as StateValidationError
