@@ -82,11 +82,11 @@ class TestState(TestCase):
             def a_state(self, store=False):
                 pass
 
-        obj = Object(self)
+        obj = Object()
         obj.a_state(store=True)
         sleep()
-        self.assertNotNone(obj.state)
+        self.assertIsNotNone(obj.state)
         obj.state = None
         obj.a_state(store=False)
         sleep()
-        self.assertNone(obj.state)
+        self.assertIsNone(obj.state)
