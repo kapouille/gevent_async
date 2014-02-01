@@ -12,7 +12,7 @@ class ValidationError(Exception):
 
 class State(Greenlet):
     def __init__(self, fun, transitions_out, *args, **kwargs):
-        self._name = fun.__name__
+        self.name = fun.__name__
         if transitions_out:
             if type(transitions_out) != list:
                 transitions_out = [transitions_out]
@@ -26,13 +26,13 @@ class State(Greenlet):
         if name not in self._transitions_out:
             raise ValidationError("Moving to invalid state "
                                   "{} from {}".format(name,
-                                                      self._name))
+                                                      self.name))
 
     def __str__(self):
-        return "<State name={}>".format(self._name)
+        return "<State name={}>".format(self.name)
 
 
-def state(function=None, transitions_to=None):
+def state(function=None, transitions_to=None, on_start=None):
     def func_wrapper(fun):
         @wraps(fun)
         def spawn_state(*args, **kwargs):
@@ -43,7 +43,9 @@ def state(function=None, transitions_to=None):
 
             new = State(fun, transitions_to, *args, **kwargs)
             new.start()
-            _LOG.debug("Launching state %s", new._name)
+            if on_start:
+                on_start(new, *args, **kwargs)
+            _LOG.debug("Launching state %s", new.name)
             if current_state:
                 _LOG.debug("Leaving state %s", current_state._name)
                 raise GreenletExit

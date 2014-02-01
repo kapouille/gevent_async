@@ -68,3 +68,25 @@ class TestState(TestCase):
         sleep()
         self.assertIn("initial", obj.reached)
         self.assertNotIn("second", obj.reached)
+
+    def test_callback(self):
+        def on_transition(new_state, target, *args, **kwargs):
+            if "store" in kwargs and kwargs["store"]:
+                target.state = new_state
+
+        class Object(object):
+            def __init__(self):
+                self.state = None
+
+            @state(on_start=on_transition)
+            def a_state(self, store=False):
+                pass
+
+        obj = Object(self)
+        obj.a_state(store=True)
+        sleep()
+        self.assertNotNone(obj.state)
+        obj.state = None
+        obj.a_state(store=False)
+        sleep()
+        self.assertNone(obj.state)
