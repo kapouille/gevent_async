@@ -3,6 +3,8 @@
 A small set of utilities to help with writing synchronous code flows in a collaborative multitasking context.
 It has been designed around the feature set of gevent (http://www.gevent.org)
 
+------------------------------------------------------------------------------------------------------------
+
 ## deferred calls ##
 
 ``async.DeferredCallHandler`` is a wrapper for asynchronously handled function calls.
@@ -154,6 +156,8 @@ within a given time frame:
     except gevent.Timeout:
         pass # We should hit that
 
+------------------------------------------------------------------------------------------------------------
+
 ## multitask state handling ##
 
 Partially inspired by the mechanism of tail recursion, we provide a way to contain and handle code
@@ -179,7 +183,8 @@ For instance:
     def flowering()
         # Grow flowers
         if is_eaten:
-            dead() # the flowering greenlet terminates and leaves way to the dead one
+            # parameters can be given to state changes.
+            dead(is_eaten=True) # the flowering greenlet terminates and leaves way to the dead one
         else:
             withering() # the flowering greenlet terminates and leaves way to the withering one
 
@@ -189,8 +194,9 @@ For instance:
         dead() # the withering greenlet terminates and leaves way to the dead one
 
     @state # terminal state, no transitions
-    def dead()
-        # clean up phase
+    def dead(is_eaten=False)
+        if not is_eaten:
+            # clean up phase
 
 
     sprouting() # spawns the initial state
@@ -207,3 +213,35 @@ The ``@state`` decorator can also be used for methods:
 
 Correct transitions must be specified by the ``transitions_to`` parameter or any incorrect transition
 will raise the ``ValidationError`` exception.
+
+### Callbacks ###
+
+Callbacks can be defined on transition. By setting the on_start parameter to a state, a given callback will
+be activated whenever a state is started.
+
+* WARNING * : The callback code is executed on the greenlet issuing the state transition, not the greenlet
+of the new state.
+
+The expected callback signature is ``def on_start(state, *args, **kwargs)``, where ``state`` is the
+(at that point, still not started) ``async.state.State`` state greenlet which will handle the execution of the state and
+``*args`` and ``**kwargs`` are the parameters given to the state call.
+
+For instance:
+
+    def on_transition(new_state, target, *args, **kwargs):
+        if "store" in kwargs and kwargs["store"]:
+            target.state = new_state
+
+    class Object(object):
+        def __init__(self):
+            self.state = None
+
+        @state(on_start=on_transition)
+        def a_state(self, store=False):
+            pass
+
+    obj = Object()
+    obj.a_state(store=True)
+    sleep()
+
+    obj.state # => is now storing the current state object.
