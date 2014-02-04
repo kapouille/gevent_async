@@ -70,11 +70,15 @@ We can startup the manager and call functions on it from multiple greenlets:
 
 ### DeferredCallHandler API documentation ###
 
-* ``def process(forever=False)``:
+* ``def process(forever=False, whitelist=None)``:
 
   Processes all the the pending deferred calls.
+
   If ``forever`` is set to ``True``, process will remain waiting for new calls until
   a call to ``stop_processing()`` is performed.
+
+  If ``whitelist`` is set as a list of string, only functions which names match the elements
+  in the white list will be executed.
 
 * ``def stop_processing()``:
 
@@ -155,6 +159,8 @@ within a given time frame:
         slow.sync(timeout=1).taking_my_time()
     except gevent.Timeout:
         pass # We should hit that
+
+
 
 ------------------------------------------------------------------------------------------------------------
 

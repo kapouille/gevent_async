@@ -7,7 +7,7 @@ _LOG = getLogger(__name__)
 
 class _SyncCall(object):
     def __init__(self, name, *args, **kwargs):
-        self._name = name
+        self.name = name
         self._args = args
         self._kwargs = kwargs
         self._result = AsyncResult()
@@ -17,7 +17,7 @@ class _SyncCall(object):
 
     def execute(self, target):
         try:
-            function = getattr(target, self._name)
+            function = getattr(target, self.name)
             self._result.set(function(*self._args, **self._kwargs))
         except Exception as error:
             self._result.set_exception(error)
@@ -49,17 +49,19 @@ class _Sync(object):
 
 class _OnewayCall(object):
     def __init__(self, name, *args, **kwargs):
-        self._name = name
+        self.name = name
         self._args = args
         self._kwargs = kwargs
 
     def execute(self, target):
         try:
-            function = getattr(target, self._name)
+            function = getattr(target, self.name)
             function(*self._args, **self._kwargs)
         except Exception as error:
-            _LOG.exception("Oneway call on {} failed with error: {}".format(function,
-                                                                            error))
+            _LOG.exception("Oneway call of {} on {} "
+                           "failed with error: {}".format(self.name,
+                                                          target,
+                                                          error))
 
 class _OneWay(object):
     class Handle(object):
@@ -93,6 +95,7 @@ class DeferredCallHandler(object):
     def stop_processing(self):
         self._requests.put(StopIteration)
 
-    def process(self, forever=False):
+    def process(self, forever=False, whitelist=None):
         for event in self._requests.all(until_empty=not forever):
-            event.execute(self)
+            if not whitelist or event.name in whitelist:
+                event.execute(self)
