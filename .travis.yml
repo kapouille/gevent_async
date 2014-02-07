@@ -5,3 +5,11 @@ install:
 - pip install .
 - pip install -r requirements-test.txt
 script: nosetests
+deploy:
+  provider: pypi
+  user: kapouille
+  password:
+    secure: cruC5WLjSXKWaJNy7LANOxpPE1gJMEEtIziWq9rR2TRrNvkgses/QK1L3hFs1hNWF5FXubx116gDp8tLma7Xa81DMMrijRBhN99v67fYMtFmtDzcjKn9/czACWcSkTFFCwLf8hEu6GMW0Fo4nBCqJKQbRx5UksOSj5clG7Pul3w=
+  on:
+    tags: true
+    repo: kapouille/gevent_async
