@@ -47,7 +47,7 @@ def state(function=None, transitions_to=None, on_start=None):
                 on_start(new, *args, **kwargs)
             _LOG.debug("Launching state %s", new.name)
             if current_state:
-                _LOG.debug("Leaving state %s", current_state._name)
+                _LOG.debug("Leaving state %s", current_state.name)
                 raise GreenletExit
         return spawn_state
 
