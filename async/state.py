@@ -4,7 +4,6 @@ from gevent import Greenlet, getcurrent, GreenletExit
 
 _LOG = logging.getLogger(__name__)
 logging.basicConfig()
-logging.root.setLevel(logging.DEBUG)
 
 
 class ValidationError(Exception):
