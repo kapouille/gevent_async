@@ -9,6 +9,7 @@ logging.basicConfig()
 class ValidationError(Exception):
     pass
 
+
 class State(Greenlet):
     def __init__(self, fun, transitions_out, *args, **kwargs):
         self.name = fun.__name__
@@ -27,9 +28,6 @@ class State(Greenlet):
                                   "{} from {}".format(name,
                                                       self.name))
 
-    def __str__(self):
-        return "<State name={}>".format(self.name)
-
 
 def state(function=None, transitions_to=None, on_start=None):
     def func_wrapper(fun):
@@ -44,9 +42,8 @@ def state(function=None, transitions_to=None, on_start=None):
             new.start()
             if on_start:
                 on_start(new, *args, **kwargs)
-            _LOG.debug("Launching state %s", new.name)
+            _LOG.debug("Moving to state {}".format(new))
             if current_state:
-                _LOG.debug("Leaving state %s", current_state.name)
                 raise GreenletExit
         return spawn_state
 

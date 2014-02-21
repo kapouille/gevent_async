@@ -4,7 +4,7 @@ from util import get_version, read_requirements, read_file
 
 NAME = 'gevent_async'
 VERSION = get_version(NAME)
-README = read_file("README.md")
+README = read_file("README.rst")
 CHANGES = ''
 
 

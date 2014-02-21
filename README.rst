@@ -1,11 +1,15 @@
-# gevent_async #
+============
+gevent_async
+============
 
 A small set of utilities to help with writing synchronous code flows in a collaborative multitasking context.
 It has been designed around the feature set of gevent (http://www.gevent.org)
 
 ------------------------------------------------------------------------------------------------------------
 
-## deferred calls ##
+--------------
+deferred calls
+--------------
 
 ``async.DeferredCallHandler`` is a wrapper for asynchronously handled function calls.
 This allows to control in which context the execution of those functions are done, which is essential
@@ -17,9 +21,10 @@ There are 2 available types of calls:
     - ``oneway`` (one way): this type of call returns instantly. Due to its nature, there is no way to know
     whether, once it has been processed, it has succeeded or failed.
 
-### Example ###
+Example
+=======
 
-For instance, imagining we have a Manager entity that must handle some resources in an atomic manner:
+For instance, imagining we have a Manager entity that must handle some resources in an atomic manner::
 
     from async import DeferredCallHandler
     class Manager(DeferredCallHandler):
@@ -42,7 +47,7 @@ For instance, imagining we have a Manager entity that must handle some resources
             while True:
                 self.manage()
 
-We can startup the manager and call functions on it from multiple greenlets:
+We can startup the manager and call functions on it from multiple greenlets::
 
     manager = Manager()
     gevent.spawn(manager.run)
@@ -68,7 +73,8 @@ We can startup the manager and call functions on it from multiple greenlets:
 
     consumer()
 
-### DeferredCallHandler API documentation ###
+DeferredCallHandler API documentation
+=====================================
 
 * ``def process(forever=False, whitelist=None)``:
 
@@ -85,9 +91,10 @@ We can startup the manager and call functions on it from multiple greenlets:
   Interrupts the iteration through incoming calls of a DeferredCallHandler's call to
   ``process(forever=True)``.
 
-### Exceptions ###
+Exceptions
+==========
 
-sync calls will forward exceptions just like regular functions:
+sync calls will forward exceptions just like regular functions::
 
     from async import DeferredCallHandler
     class Lemming(DeferredCallHandler):
@@ -106,9 +113,10 @@ sync calls will forward exceptions just like regular functions:
     # This should trigger the exception but produce an exception log entry.
     lemming.oneway.kaboom()
 
-### Regular function calls ###
+Regular function calls
+======================
 
-``DeferredCallHandler`` objects don't prevent direct function calls. Use at your own risk:
+``DeferredCallHandler`` objects don't prevent direct function calls. Use at your own risk::
 
     from async import DeferredCallHandler
     class Manager(DeferredCallHandler):
@@ -141,10 +149,11 @@ sync calls will forward exceptions just like regular functions:
     resources = manager.sync.access_resources()
     # In that case, we're guaranteed the management process is not running.
 
-### Timeouts ###
+Timeouts
+========
 
 ``sync`` calls can be specified with an optional timeout, to ensure actions are performed
-within a given time frame:
+within a given time frame::
 
     from async import DeferredCallHandler
     class ABitSlow(DeferredCallHandler):
@@ -162,7 +171,9 @@ within a given time frame:
 
 ------------------------------------------------------------------------------------------------------------
 
-## multitask state handling ##
+------------------------
+multitask state handling
+------------------------
 
 Partially inspired by the mechanism of tail recursion, we provide a way to contain and handle code
 to manage the behaviour of state machines within greenlets.
@@ -171,7 +182,7 @@ The ``@state`` decorator transforms a function method into a state greenlet. Whe
 is invoked, it create a new state greenlet that replaces the current state greenlet, effectively replicating
 the behaviour of tail recursion.
 
-For instance:
+For instance::
 
     @state(transitions_to="growing")
     def sprouting()
@@ -205,7 +216,7 @@ For instance:
 
     sprouting() # spawns the initial state
 
-The ``@state`` decorator can also be used for methods:
+The ``@state`` decorator can also be used for methods::
 
     class Flower()
         @state(transitions_to="growing")
@@ -218,19 +229,19 @@ The ``@state`` decorator can also be used for methods:
 Correct transitions must be specified by the ``transitions_to`` parameter or any incorrect transition
 will raise the ``ValidationError`` exception.
 
-### Callbacks ###
+Callbacks
+=========
 
 Callbacks can be defined on transition. By setting the on_start parameter to a state, a given callback will
 be activated whenever a state is started.
 
-* WARNING * : The callback code is executed on the greenlet issuing the state transition, not the greenlet
-of the new state.
+.. attention:: The callback code is executed on the greenlet issuing the state transition, not the greenlet of the new state.
 
 The expected callback signature is ``def on_start(state, *args, **kwargs)``, where ``state`` is the
 (at that point, still not started) ``async.state.State`` state greenlet which will handle the execution of the state and
 ``*args`` and ``**kwargs`` are the parameters given to the state call.
 
-For instance:
+For instance::
 
     def on_transition(new_state, target, *args, **kwargs):
         if "store" in kwargs and kwargs["store"]:
@@ -249,3 +260,4 @@ For instance:
     sleep()
 
     obj.state # => is now storing the current state object.
+
