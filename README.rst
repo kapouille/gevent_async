@@ -15,14 +15,16 @@ in collaborative multitasking.
 
 There are 2 available types of calls:
     - ``sync`` (synchronous): this type of call awaits for the deferred call handle to process the call
-    to return. for a user's perspective, it behaves like a regular function call.
+      to return. for a user's perspective, it behaves like a regular function call.
     - ``oneway`` (one way): this type of call returns instantly. Due to its nature, there is no way to know
-    whether, once it has been processed, it has succeeded or failed.
+      whether, once it has been processed, it has succeeded or failed.
 
 Example
 =======
 
-For instance, imagining we have a Manager entity that must handle some resources in an atomic manner::
+For instance, imagining we have a Manager entity that must handle some resources in an atomic manner:
+
+.. code-block:: python
 
     from async import DeferredCallHandler
     class Manager(DeferredCallHandler):
@@ -45,7 +47,9 @@ For instance, imagining we have a Manager entity that must handle some resources
             while True:
                 self.manage()
 
-We can startup the manager and call functions on it from multiple greenlets::
+We can startup the manager and call functions on it from multiple greenlets:
+
+.. code-block:: python
 
     manager = Manager()
     gevent.spawn(manager.run)
@@ -92,7 +96,9 @@ DeferredCallHandler API documentation
 Exceptions
 ==========
 
-sync calls will forward exceptions just like regular functions::
+sync calls will forward exceptions just like regular functions:
+
+.. code-block:: python
 
     from async import DeferredCallHandler
     class Lemming(DeferredCallHandler):
@@ -114,7 +120,9 @@ sync calls will forward exceptions just like regular functions::
 Regular function calls
 ======================
 
-``DeferredCallHandler`` objects don't prevent direct function calls. Use at your own risk::
+``DeferredCallHandler`` objects don't prevent direct function calls. Use at your own risk:
+
+.. code-block:: python
 
     from async import DeferredCallHandler
     class Manager(DeferredCallHandler):
@@ -151,7 +159,9 @@ Timeouts
 ========
 
 ``sync`` calls can be specified with an optional timeout, to ensure actions are performed
-within a given time frame::
+within a given time frame:
+
+.. code-block:: python
 
     from async import DeferredCallHandler
     class ABitSlow(DeferredCallHandler):
@@ -178,7 +188,9 @@ The ``@state`` decorator transforms a function method into a state greenlet. Whe
 is invoked, it create a new state greenlet that replaces the current state greenlet, effectively replicating
 the behaviour of tail recursion.
 
-For instance::
+For instance:
+
+.. code-block:: python
 
     @state(transitions_to="growing")
     def sprouting()
@@ -212,9 +224,11 @@ For instance::
 
     sprouting() # spawns the initial state
 
-The ``@state`` decorator can also be used for methods::
+The ``@state`` decorator can also be used for methods:
 
-    class Flower()
+.. code-block:: python
+
+    class Flower(object):
         @state(transitions_to="growing")
         def sprouting(self)
             # germination process here
@@ -237,7 +251,9 @@ The expected callback signature is ``def on_start(state, *args, **kwargs)``, whe
 (at that point, still not started) ``async.state.State`` state greenlet which will handle the execution of the state and
 ``*args`` and ``**kwargs`` are the parameters given to the state call.
 
-For instance::
+For instance:
+
+.. code-block:: python
 
     def on_transition(new_state, target, *args, **kwargs):
         if "store" in kwargs and kwargs["store"]:
