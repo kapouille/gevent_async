@@ -5,8 +5,6 @@ gevent_async
 A small set of utilities to help with writing synchronous code flows in a collaborative multitasking context.
 It has been designed around the feature set of gevent (http://www.gevent.org)
 
-------------------------------------------------------------------------------------------------------------
-
 --------------
 deferred calls
 --------------
@@ -168,8 +166,6 @@ within a given time frame::
         slow.sync(timeout=1).taking_my_time()
     except gevent.Timeout:
         pass # We should hit that
-
-------------------------------------------------------------------------------------------------------------
 
 ------------------------
 multitask state handling

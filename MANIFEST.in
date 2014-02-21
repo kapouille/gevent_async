@@ -1,1 +1,1 @@
-include *.md *.txt util.py
+include *.rst *.txt util.py
