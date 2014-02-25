@@ -90,3 +90,26 @@ class TestState(TestCase):
         obj.a_state(store=False)
         sleep()
         self.assertIsNone(obj.state)
+
+    def test_execution_started(self):
+        def on_transition(new_state, target):
+            target.state = new_state
+
+        class Object(object):
+            def __init__(self):
+                self.state = None
+
+            @state(on_start=on_transition)
+            def a_state(self):
+                pass
+
+        obj = Object()
+        obj.a_state()
+
+        self.assertIsNotNone(obj.state)
+        self.assertFalse(obj.state.execution_started.ready())
+
+        sleep()
+
+        self.assertTrue(obj.state.execution_started.ready())
+

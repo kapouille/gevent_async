@@ -1,6 +1,7 @@
 from functools import wraps
 import logging
 from gevent import Greenlet, getcurrent, GreenletExit
+from gevent.event import Event
 
 _LOG = logging.getLogger(__name__)
 logging.basicConfig()
@@ -11,15 +12,25 @@ class ValidationError(Exception):
 
 
 class State(Greenlet):
+
     def __init__(self, fun, transitions_out, *args, **kwargs):
-        self.name = fun.__name__
+
+        self._execution_started = Event()
+
+        def once_started(*args, **kwargs):
+            self._execution_started.set()
+            fun(*args, **kwargs)
+
+        self.name = fun.func_name
+        once_started.func_name = self.name
+
         if transitions_out:
             if type(transitions_out) != list:
                 transitions_out = [transitions_out]
         else:
             transitions_out = []
         self._transitions_out = transitions_out
-        super(State, self).__init__(fun, *args, **kwargs)
+        super(State, self).__init__(once_started, *args, **kwargs)
 
     def validate_transition(self, to_fun):
         name = to_fun.__name__
@@ -27,6 +38,9 @@ class State(Greenlet):
             raise ValidationError("Moving to invalid state "
                                   "{} from {}".format(name,
                                                       self.name))
+    @property
+    def execution_started(self):
+        return self._execution_started
 
 
 def state(function=None, transitions_to=None, on_start=None):
