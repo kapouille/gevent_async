@@ -273,3 +273,29 @@ For instance:
 
     obj.state # => is now storing the current state object.
 
+Execution started event
+=======================
+
+When a state object has started its execution (ie. when gevent has scheduled it for execution)
+an ``execution_started`` ``gevent.event.Event`` is set:
+
+.. code-block:: python
+
+        def on_transition(new_state, target):
+            target.state = new_state
+
+        class Object(object):
+            def __init__(self):
+                self.state = None
+
+            @state(on_start=on_transition)
+            def a_state(self):
+                pass
+
+        obj = Object()
+        obj.a_state()
+        # at that point, obj.state is set
+
+        # now we wait until it's scheduled
+        obj.state.execution_started.wait()
+
