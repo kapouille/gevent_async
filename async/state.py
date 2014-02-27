@@ -1,7 +1,9 @@
 from functools import wraps
 import logging
-from gevent import Greenlet, getcurrent, GreenletExit
+
+from gevent import Greenlet, getcurrent, GreenletExit, sleep
 from gevent.event import Event
+
 
 _LOG = logging.getLogger(__name__)
 logging.basicConfig()
@@ -47,6 +49,11 @@ def state(function=None, transitions_to=None, on_start=None):
     def func_wrapper(fun):
         @wraps(fun)
         def spawn_state(*args, **kwargs):
+            # bodge fix for https://github.com/surfly/gevent/issues/394
+            # this will allow state handling code to catch pending
+            # exception before it's too late
+            sleep()
+
             current_state = getcurrent() if type(getcurrent()) == State else None
 
             if current_state:
@@ -68,5 +75,3 @@ def state(function=None, transitions_to=None, on_start=None):
 
     else:
         return func_wrapper(function)
-
-    return func_wrapper
