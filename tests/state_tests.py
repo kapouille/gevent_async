@@ -1,6 +1,8 @@
 from gevent import sleep
-from async import state, StateValidationError
 from unittest2 import TestCase
+
+from async import state, StateValidationError
+
 
 __author__ = 'ocarrere'
 
@@ -37,12 +39,14 @@ class TestState(TestCase):
 
         obj = Object()
         obj.initial()
-        all_states = set(["initial", "second"])
+        all_states = {"initial", "second"}
         self.assertNotEqual(obj.reached, all_states)
         # allow scheduling for the first state
         sleep()
+        sleep()  # FIXME: https://github.com/surfly/gevent/issues/394
         # allow scheduling for the second state
         sleep()
+        sleep()  # FIXME: https://github.com/surfly/gevent/issues/394
         self.assertEqual(obj.reached, all_states)
 
     def test_wrong_transition(self):
