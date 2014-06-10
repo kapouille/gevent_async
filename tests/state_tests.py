@@ -12,11 +12,13 @@ from Queue import Queue, Empty
 
 _LOG = logging.getLogger(__name__)
 
+
 class TestState(TestCase):
 
     @contextmanager
     def transition_tracking(self):
         transitions = collections.defaultdict(lambda: Queue(maxsize=1))
+
         def tracker(state_machine):
             while True:
                 from_to = yield
@@ -127,7 +129,6 @@ class TestState(TestCase):
 
             self.assertEqual(len(transition_map), 1)
 
-
     def test_wrong_transition(self):
         class Object(object):
             @state(transitions_to="second")
@@ -183,4 +184,3 @@ class TestState(TestCase):
         obj.a_state(store=False)
         sleep()
         self.assertIsNone(obj.state)
-

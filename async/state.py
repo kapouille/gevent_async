@@ -110,7 +110,9 @@ class StateGreenlet(gevent.Greenlet):
     def __init__(self, state_machine, state, params):
         self.state_machine = state_machine
         self.state = state
-        super(StateGreenlet, self).__init__(state, *params.args, **params.kwargs)
+        super(StateGreenlet, self).__init__(state,
+                                            *params.args,
+                                            **params.kwargs)
 
 
 def spawn_state(state, params):
