@@ -245,8 +245,6 @@ Callbacks
 Callbacks can be defined on transition. By setting the on_start parameter to a state, a given callback will
 be activated whenever a state is started.
 
-.. attention:: The callback code is executed on the greenlet issuing the state transition, not the greenlet of the new state.
-
 The expected callback signature is ``def on_start(state, *args, **kwargs)``, where ``state`` is the
 (at that point, still not started) ``async.state.State`` state greenlet which will handle the execution of the state and
 ``*args`` and ``**kwargs`` are the parameters given to the state call.
@@ -272,30 +270,4 @@ For instance:
     sleep()
 
     obj.state # => is now storing the current state object.
-
-Execution started event
-=======================
-
-When a state object has started its execution (ie. when gevent has scheduled it for execution)
-an ``execution_started`` ``gevent.event.Event`` is set:
-
-.. code-block:: python
-
-        def on_transition(new_state, target):
-            target.state = new_state
-
-        class Object(object):
-            def __init__(self):
-                self.state = None
-
-            @state(on_start=on_transition)
-            def a_state(self):
-                pass
-
-        obj = Object()
-        obj.a_state()
-        # at that point, obj.state is set
-
-        # now we wait until it's scheduled
-        obj.state.execution_started.wait()
 

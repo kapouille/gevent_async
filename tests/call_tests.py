@@ -65,17 +65,17 @@ class TestDeferredCalls(TestCase):
     def test_timeout(self):
         class Handler(DeferredCallHandler):
             def about_right(self):
-                sleep(.1)
+                sleep(.01)
 
             def takes_too_long(self):
-                sleep(10)
+                sleep(1)
 
         handler = Handler()
         spawn(handler.process, forever=True)
-        handler.sync(timeout=1).about_right()
+        handler.sync(timeout=.1).about_right()
 
         self.assertRaises(Timeout,
-                          handler.sync(timeout=1).takes_too_long)
+                          handler.sync(timeout=.1).takes_too_long)
         handler.stop_processing()
 
     def test_oneway(self):
