@@ -20,6 +20,8 @@ setup(
         "Topic :: Utilities"
     ],
     author='Olivier Carrere',
+    description=('A small set of utilities to help with writing synchronous'
+                 'code flows in a collaborative multitasking context.'),
     author_email='olivier.carrere@gmail.com',
     url='http://github.com/kapouille/gevent_async',
     keywords='gevent state asychronous synchronous',

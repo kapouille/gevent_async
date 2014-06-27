@@ -63,6 +63,7 @@ class _OnewayCall(object):
                                                           target,
                                                           error))
 
+
 class _OneWay(object):
     class Handle(object):
         def __init__(self, target, name):

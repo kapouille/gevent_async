@@ -52,6 +52,7 @@ class TestDeferredCalls(TestCase):
     def test_exception(self):
         class Kaboom(Exception):
             pass
+
         class Handler(DeferredCallHandler):
             def kaboom(self):
                 raise Kaboom()
