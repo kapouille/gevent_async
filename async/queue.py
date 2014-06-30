@@ -2,6 +2,7 @@ from gevent.queue import Queue
 
 __author__ = 'ocarrere'
 
+
 class Event(object):
     def __init__(self, name, data=None):
         self._name = name
