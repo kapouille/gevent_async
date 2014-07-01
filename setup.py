@@ -1,6 +1,7 @@
 import os
 import re
 import versioneer
+from distutils.command.sdist import sdist as _sdist
 from setuptools import setup, find_packages
 
 versioneer.versionfile_source = 'async/_version.py'
@@ -15,8 +16,10 @@ def read_file(filename):
     with open(os.path.join(HERE, filename)) as fh:
         return fh.read().strip(' \t\n\r')
 
+
 def read_requirements(filename):
     return read_file(filename).splitlines()
+
 
 def pep440_version(versioneer_version):
     parts = re.match(
@@ -35,12 +38,27 @@ def pep440_version(versioneer_version):
 
     return version
 
+
+# Need this part to ensure the published version uses the pep440 version
+class cmd_sdist(versioneer.cmd_sdist):
+    def run(self):
+        versions = versioneer.get_versions(verbose=True)
+        self._versioneer_generated_versions = versions
+        # unless we update this, the command will keep using the old version
+        self.distribution.metadata.version = pep440_version(
+            versions["version"])
+        return _sdist.run(self)
+
+
+cmdclass = versioneer.get_cmdclass()
+cmdclass['sdist'] = cmd_sdist
+
 README = read_file("README.rst")
 
 setup(
     name='gevent_async',
     version=pep440_version(versioneer.get_version()),
-    cmdclass=versioneer.get_cmdclass(),
+    cmdclass=cmdclass,
     classifiers=[
         "Programming Language :: Python",
         "Development Status :: 4 - Beta",
