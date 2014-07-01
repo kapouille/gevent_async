@@ -1,1 +1,3 @@
 include *.rst *.txt util.py
+include versioneer.py
+include async/_version.py

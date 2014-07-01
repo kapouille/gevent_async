@@ -1,17 +1,46 @@
+import os
+import re
+import versioneer
 from setuptools import setup, find_packages
 
-from util import get_version, read_requirements, read_file
+versioneer.versionfile_source = 'async/_version.py'
+versioneer.versionfile_build = 'async/_version.py'
+versioneer.tag_prefix = 'v'
+versioneer.parentdir_prefix = 'gevent_async-'
+
+HERE = os.path.dirname(__file__)
 
 
-NAME = 'gevent_async'
-VERSION = get_version(NAME)
+def read_file(filename):
+    with open(os.path.join(HERE, filename)) as fh:
+        return fh.read().strip(' \t\n\r')
+
+def read_requirements(filename):
+    return read_file(filename).splitlines()
+
+def pep440_version(versioneer_version):
+    parts = re.match(
+        '(?P<number>[0-9.]+)'
+        '(?:-(?P<distance>[1-9][0-9]*))?'
+        '(?:-(?P<revision>g[0-9a-f]{7}))?'
+        '(?:-(?P<dirty>dirty))?', versioneer_version
+        ).groupdict()
+    version = parts['number']
+    if parts['distance']:
+        version += '.post0.dev' + parts['distance']
+    elif parts['dirty']:
+        # If we're building from a dirty tree, make sure that
+        # this is flagged as a dev version
+        version += '.post0.dev0'
+
+    return version
+
 README = read_file("README.rst")
-CHANGES = ''
-
 
 setup(
-    name=NAME,
-    version=VERSION,
+    name='gevent_async',
+    version=pep440_version(versioneer.get_version()),
+    cmdclass=versioneer.get_cmdclass(),
     classifiers=[
         "Programming Language :: Python",
         "Development Status :: 4 - Beta",
